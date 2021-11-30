@@ -85,12 +85,12 @@ void dialogue_client(int *p)
 
     case 0:
       printf("en attente du Client... \n");
-      recv(socketClient, &chaine_carac, sizeof(char[10000]), 0);
+      read(socketClient, &chaine_carac, sizeof(char[10000]));
 
       if (chaine_carac != NULL)
       {
         printf("message \"%s\" bien reçu \n", chaine_carac);
-        send(socketClient, &test, sizeof(int), 0);
+        write(socketClient, &test, sizeof(int));
       }
 
       close(socketClient);

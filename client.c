@@ -55,11 +55,11 @@ void dialogue_serveur(int *descripteur_fichier_client)
 
     //envoi du message
     
-    send(*descripteur_fichier_client, message, sizeof(message), 0);
+    write(*descripteur_fichier_client, message, sizeof(message));
     printf("Message envoyé\n");
 
     // Reception de l'entier
-    recv(*descripteur_fichier_client, &entier, sizeof(int), 0);
+    read(*descripteur_fichier_client, &entier, sizeof(int));
     printf("Entier reçu du serveur : %d\n", entier);
 
     //fermeture de la connection
