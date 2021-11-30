@@ -1,67 +1,67 @@
 #include "client.h"
 
-void initialisation(int *p, char *hostName, int noport)
+void initialisationConnection(int *descripteur_fichier_client, char *hostName, int Nport)
 {
-    struct hostent *h;
-    struct sockaddr_in s;
+    
+    struct sockaddr_in pointeur_socket;
+    struct hostent *host_name;
     
     //strcpy(hostName, argv[1]);
 
-    //creation du socket
-    *p = socket(AF_INET, SOCK_STREAM, 0);
+    //---------creation du socket--------
+    *descripteur_fichier_client = socket(AF_INET, SOCK_STREAM, 0);
+	
+	switch(*descripteur_fichier_client){
+		case -1:
+			perror("socket");
+			exit(-1);
+		default :
+			 printf("Descripteur créé : %d\n", *descripteur_fichier_client);
+			 break;
+	}
 
-    if (*p == -1)
-    {
-        perror("socket");
-        exit(-1);
-    }
-    else
-    {
-        printf("Descripteur créé : %d\n", &p);
-    }
-
-    //récupération dans h des informations concernant le serveur
-    h = gethostbyname(hostName);
-    //memcpy(&s.sin_addr.s_addr, h->h_addr, h->h_length);
+    //récupération dans host_name des informations concernant le serveur
+    host_name = gethostbyname(hostName);
+    memcpy(&pointeur_socket.sin_addr.s_addr, host_name->h_addr, host_name->h_length);
 
     //preparation des champs sin_family, sin_addr et sin_port
-    s.sin_addr = *((struct in_addr *)h->h_addr);
-    s.sin_family = AF_INET;
-    s.sin_port = htons(noport);
+    pointeur_socket.sin_addr = *((struct in_addr *)host_name->h_addr);
+    pointeur_socket.sin_family = AF_INET;
+    pointeur_socket.sin_port = htons(Nport);
 
     //Demande de connexion
-    if (connect(*p, (const struct sockaddr *)&s, sizeof(s)) == -1)
+    if (connect(*descripteur_fichier_client, (const struct sockaddr *)&pointeur_socket, sizeof(struct sockaddr_in)) == -1)
     {
         perror("connect");
         exit(-1);
     }
     else
     {
-        printf("connect succes \n");
+        printf("connection établie \n");
     }
 }
 
-void dialogue(int *p)
+void dialogue_serveur(int *descripteur_fichier_client)
 {
-    char *message;
+    char message[10000];
     int entier;
 
 
     //message à envoyer
-    message = malloc(sizeof(char*));
-    printf("Veuillez entrer un message!!\n");
-    scanf("%s", message);
-    printf("Message en attente d'envoi \n");
+    //message = malloc(sizeof(char*));
+    printf("Veuillez taper un message :\n");
+    scanf("%[^\n]", message);         //scanne tout sauf les retours à la ligne.
+    printf("Message en attente d'envoi... \n");
 
     //envoi du message
     
-    send(*p, message, sizeof(message), 0);
-    printf("Message envoyé avec succes!!!\n");
+    send(*descripteur_fichier_client, message, sizeof(message), 0);
+    printf("Message envoyé\n");
 
     // Reception de l'entier
-    recv(*p, &entier, sizeof(int), 0);
-    printf("Entier recu : %d\n", entier);
+    recv(*descripteur_fichier_client, &entier, sizeof(int), 0);
+    printf("Entier reçu du serveur : %d\n", entier);
 
     //fermeture de la connection
-    close(*p);
+    close(*descripteur_fichier_client);
 }

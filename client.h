@@ -13,8 +13,14 @@
 #include <signal.h>
 #include <string.h>
 
-void initialisation(int *p, char *hostName, int noport);
-void dialogue(int *p);
+/*prend l'adresse d'un entier p, le nom de l'hôte hostName et le numéro de port noport en argument
+crée un socket, récupère les informations du serveur grâce au nom et demande la connection*/
+void initialisationConnection(int *descripteur_fichier_client, char *hostName, int Nport);
+
+
+/*prend le noméro de socket p en argument, attend une chaine de cacactère de l'entrée standard et envoie cette chaine par le socket. 
+Attend ensuite la réception d'un entier par le socket*/
+void dialogue_serveur(int *descripteur_fichier_client);
 
 
 #endif

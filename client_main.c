@@ -1,20 +1,10 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <signal.h>
 #include "client.h"
 
 int main(int argc, char *argv[])
 {
 
-    int p;      //descripteur de fichier
-    int noport; //port
+    int descripteur_fichier_client;      //descripteur de fichier
+    int Nport; //port
     char *hostName;
 
     if (argc != 3)
@@ -23,11 +13,11 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    noport = atoi(argv[2]);
+    Nport = atoi(argv[2]);
     hostName = argv[1];
 
-    initialisation(&p, hostName, noport);
-    dialogue(&p);
+    initialisationConnection(&descripteur_fichier_client, hostName, Nport);
+    dialogue_serveur(&descripteur_fichier_client);
 
     return 0;
 }

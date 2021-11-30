@@ -12,8 +12,18 @@
 #include <signal.h>
 
 
-void initialisation(int *p, int noport);
-void dialogueClient(int *p);
+/*prend en argument l'adresse d'un entier p et l'entier représentant le numéro de port noport. 
+Crée un socket d'écoute puis attache la socket d'écoute p*/
+void initialisation_connection(int *p, int noport);
+
+
+/*Prend l'adresse d'un socket au format int* en argument, envoie l'entier 2 dans le socket à un client si le server reçoit un message de ce client, puis ferme le socket avec ce client.*/
+void dialogue_client(int *p);
+
+
 void end_child();
+
+
+
 
 #endif

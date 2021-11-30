@@ -1,31 +1,33 @@
 #include "serveur.h"
 
-void initialisation(int *p, int noport)
+
+
+void initialisation_connection(int *descripteur_fic, int Nport)
 {
-  struct sockaddr_in s;
+  struct sockaddr_in structure_socket;  //pointeur sur la structure qui correspond à l'adresse à laquelle la socket est attachée (serveur) 
 
   // Creation du socket de type stream
-  *p = socket(AF_INET, SOCK_STREAM, 0);
+  *descripteur_fic = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (*p == -1)  //descripteur non créé
+  if (*descripteur_fic == -1)
   {
     perror("socket");
     exit(-1);
   }
   else
   {
-    printf("Descripteur créé : %d\n", &p);
+    printf("Descripteur créé : %d\n", *descripteur_fic);
   }
 
   //preparation des champs sin_family, sin_addr et sin_port
-  s.sin_addr.s_addr = htonl(INADDR_ANY);
-  s.sin_family = AF_INET;
-  s.sin_port = htons(noport);
+  structure_socket.sin_addr.s_addr = htonl(INADDR_ANY);
+  structure_socket.sin_family = AF_INET;
+  structure_socket.sin_port = htons(Nport);
 
   //Attachement du socket à l'adresse
-  if (bind(*p, (const struct sockaddr *)&s, sizeof(s)) == -1) //si bind echoue
+  if (bind(*descripteur_fic, (const struct sockaddr *)&structure_socket, sizeof(struct sockaddr_in)) == -1) //
   {
-    perror("erreur de bind");
+    perror("bind");
     exit(-1);
   }
   else
@@ -34,25 +36,26 @@ void initialisation(int *p, int noport)
   }
 
   //ouverture du service
-  if (listen(*p, 2) == -1)
+  if (listen(*descripteur_fic, 2) == -1)
   {
     perror("Listen");
     exit(-1);
   }
   else
   {
-    printf("Listening\n");
+    printf("Listen ok\n");
   }
 }
 
-void dialogueClient(int *p)
+void dialogue_client(int *p)
 {
   int socketClient;
   struct sockaddr_in addresseClient;
-  int  taille = sizeof(addresseClient);
-  struct sigaction ac;
-  char *chaine_carac;
-  int entier = 2;
+  socklen_t taille = sizeof(addresseClient);
+  struct sigaction action;
+  char chaine_carac[10000];
+  int test = 10; //test d'envoi d'entier au client
+
 
   while (1)
   {
@@ -65,13 +68,13 @@ void dialogueClient(int *p)
     }
     else
     {
-      printf("client accepted\n");
+      printf("Accept ok\n");
     }
 
-    ac.sa_handler = end_child;
-    ac.sa_flags = SA_RESTART;
+    action.sa_handler = end_child;      //HERE <------------------------------------------------
+    action.sa_flags = SA_RESTART;
 
-    sigaction(SIGCHLD, &ac, NULL);
+    sigaction(SIGCHLD, &action, NULL);
 
     //Création d'un processus fils
     switch (fork())
@@ -81,13 +84,13 @@ void dialogueClient(int *p)
       exit(-1);
 
     case 0:
-      printf("en attente du message Client... \n");
-      recv(socketClient, &chaine_carac, sizeof(chaine_carac), 0);
+      printf("en attente du Client... \n");
+      recv(socketClient, &chaine_carac, sizeof(char[10000]), 0);
 
       if (chaine_carac != NULL)
       {
-        printf("message \"%s\" bien reçu \n", &chaine_carac);
-        send(socketClient, &entier, sizeof(int), 0);
+        printf("message \"%s\" bien reçu \n", chaine_carac);
+        send(socketClient, &test, sizeof(int), 0);
       }
 
       close(socketClient);
@@ -98,8 +101,9 @@ void dialogueClient(int *p)
   }
 }
 
-void end_child()
+void end_child() //HERE <------------------------------------------------------------------------------------------------------
 {
-  while (wait(NULL) != -1)
+  if (wait(NULL) != -1)
     ;
 }
+

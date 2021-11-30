@@ -1,21 +1,20 @@
-
 #include "serveur.h"
 
 int main(int argc, char *argv[])
 {
-
-    int p;      //descripteur de fichier
-    int noport; //port
-
+    int descripteur_fic;      //descripteur de fichier
+    int Nport; //port
+    
     if (argc != 2)
     {
         fprintf(stderr, "erreur : nombre d'arguments \n");
         exit(-1);
     }
-    noport = atoi(argv[1]);
+    Nport = atoi(argv[1]);
 
-    initialisation(&p, noport);
-    dialogueClient(&p);
+    initialisation_connection(&descripteur_fic, Nport);
+    dialogue_client(&descripteur_fic);
+    
 
     return 0;
 }
