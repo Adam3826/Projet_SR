@@ -59,6 +59,7 @@ void dialogue_client(int *p)
   int test = 10; //test d'envoi d'entier au client
   char ligne[100];
   FILE *f;
+ 
 
   while (1)
   {
@@ -93,43 +94,52 @@ void dialogue_client(int *p)
       if (chaine_carac != NULL)
       {
         printf("message \"%s\" bien reçu \n", chaine_carac);
-        write(socketClient, &test, sizeof(int));
       }
 	
-      read(socketClient, &test, sizeof(int));
+      read(socketClient, &test, sizeof(int));    //reception de la command
       printf("la valeur de test est %d\n",test);
 
+
       if(test == 1){ 
-	 printf("le serveur a bien recu votre command\n");
-	}
-	
-	
-	f = fopen("fic","w");				   //  on écrit les noms fichiers du dossier images dans un fichier  fic  
-	DIR *dirp;					  //	
-	struct dirent *dp;				  // la focntion opendir permet de la lecture dans un dossier 
-	dirp = opendir("images");			 
-	dp = readdir(dirp);				
-	int i=0;		
-	while((dp = readdir(dirp)) !=NULL){		//  lecture de chaque nom de fichier contenue dans le dossier images et l'écrire dans fic
-			fputs(dp->d_name,f);
+		printf("le serveur a bien recu votre command\n");
+		f = fopen("fic","w");				   //  on écrit les noms fichiers du dossier images dans un fichier  fic  
+		DIR *dirp;					  //	
+		struct dirent *dp;				  // la focntion opendir permet de la lecture dans un dossier 
+		dirp = opendir("images");			 
+		dp = readdir(dirp);				
+		int i=0;		
+		while((dp = readdir(dirp)) !=NULL){		//  lecture de chaque nom de fichier contenue dans le dossier images et l'écrire dans f
+			fputs(dp->d_name,f);            //  ecriture les noms de fichiers  du dossier images dans le fichier f
 			fputs("\n",f);
 			i++;		
-	   }
-	fclose(f);
+	   	   }
+		fclose(f);
 	
 	
-	f = fopen("fic","r");				// lecture du fichier fic par le processus fils  du serveur 		
-	int j = 0;
+		f = fopen("fic","r");				// lecture du fichier fic par le processus fils  du serveur 		
+		int j = 0;
 						
-        write(socketClient, &i, sizeof(int));		// cette boucle   
-        while( j<i  && fgets(ligne,10, f) != NULL){
-            fgets(ligne, 10, f);
-            write(socketClient, ligne, sizeof(ligne));
-            j++;
-	} 	
-	fclose(f);
+        	write(socketClient, &i, sizeof(int));		// l'envoie de la taille du dossier images 
+        
+        	while( j<i  && fgets(ligne,12, f) != NULL){      // cette boucle   sert  a envoyer le contenus du fichier dont on n'a stocker les noms des fihiers image du dossier images 
+          	fgets(ligne, 12, f);		         // lecture a partir du fichier 
+            	write(socketClient, ligne, sizeof(ligne));   // envoie  du contenue du fichier
+            	j++;
+		} 	
+		fclose(f); 
+	}
 	
-	
+      if (test ==2){
+      		int i=0;	
+      		read(socketClient, &i, sizeof(int));
+      		int j =0;
+      		while (j<i){
+      		    read(socketClient, &chaine_carac, sizeof(chaine_carac));	
+      		    printf("%s\n",chaine_carac);
+		j++;
+      		}
+      
+     	 }	
 
       close(socketClient);
       exit(0);

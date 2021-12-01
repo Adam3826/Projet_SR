@@ -44,11 +44,11 @@ void initialisationConnection(int *descripteur_fichier_client, char *hostName, i
 }
 
 
-void menu(int *d){
+int menu(int *d){
 
 	
 	int command  =0;
-	while(command !=3){
+
 	 
 	printf("-----------------------Menu---------------------------\n");	
 	printf("            1. consulter les fichier dans le serveur\n"); 
@@ -65,11 +65,7 @@ void menu(int *d){
 				write(*d,&command, sizeof(int));
 				break;
 			case 2:
-				printf("deposer un fichier\n");
-				char message[1000];
-				printf("veuillez entrer le fichier a deposer\n");
-				scanf("%s",message);
-				write(*d,message, sizeof(message));
+				printf("Veuillez donner le nombre de fichier a deposer jjjjjjjjj\n");
 				break;
 			case 3:
 				printf("Au revoir\n");
@@ -78,8 +74,8 @@ void menu(int *d){
 		}
 	
 
-		
-  	}
+	return command;		
+  	
 }
 
 
@@ -88,6 +84,8 @@ void dialogue_serveur(int *descripteur_fichier_client){
     int entier;
     FILE *f;
     char ligne_recu[100];
+    int command = 0;
+    int nbfic_a_deposer = 0;
 
     //message à envoyer
     //message = malloc(sizeof(char*));
@@ -103,29 +101,38 @@ void dialogue_serveur(int *descripteur_fichier_client){
     // Reception de l'entier
      
 
-      menu(descripteur_fichier_client);
-      read(*descripteur_fichier_client, &entier,sizeof(int));
-      printf("Entier reçu du serveur : %d\n", entier);
+      command = menu(descripteur_fichier_client);
+      write(*descripteur_fichier_client,&command,sizeof(int)); // envoie le code de la command 
     
-    
-      read(*descripteur_fichier_client,&entier, sizeof(int));
-      printf("------------La liste des fichier images disponible-------------\n");
-      int j=0;
-      while(j<entier-1){
-      	 read(*descripteur_fichier_client,ligne_recu, sizeof(ligne_recu));
-      	 printf(" ----> %s\n", ligne_recu);
-    	 j++;	   
+  
+     if (command == 1){
+      		read(*descripteur_fichier_client,&entier, sizeof(int));                       //reception de la taille du dossier images 
+      		printf("------------La liste des fichier images disponible-------------\n");
+      
+     	       int j=0;
+      	       while(j<entier-1){ 							//  boucle sur la taille du dossier images 
+      	       read(*descripteur_fichier_client,ligne_recu, sizeof(ligne_recu));	//  faire le read a chaque envoie du server 
+      	       printf(" ----> %s\n", ligne_recu);					// affichage  du contenue lu 
+    	       j++;	   
+      		}
+    	      }
+    	      			
+      if (command == 2){
+      
+
+      		scanf("%d",&nbfic_a_deposer);
+      		write(*descripteur_fichier_client,&nbfic_a_deposer,sizeof(int));
+      		int i =0;
+      		while(i<nbfic_a_deposer){
+      							
+      			printf("Veuillez entre le fichier %d\n",i+1);
+      			scanf("%s", message);
+      			write(*descripteur_fichier_client,message,sizeof(message));  							
+      			i++;
+      		}	     	
       }
-    			
-     	
 	
-       // printf("%s\n",tabImages[0]);
-      //  printf("%s\n",tabImages[1]);
-     // printf("%s\n",tabImages[2]);
-
  
-
-
     //fermeture de la connection
     close(*descripteur_fichier_client);
 }
