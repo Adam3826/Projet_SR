@@ -1,8 +1,8 @@
 #include "client.h"
 
-void initialisationConnection(int *descripteur_fichier_client, char *hostName, int Nport)
-{
-    
+
+void initialisationConnection(int *descripteur_fichier_client, char *hostName, int Nport){
+   
     struct sockaddr_in pointeur_socket;
     struct hostent *host_name;
     
@@ -43,25 +43,49 @@ void initialisationConnection(int *descripteur_fichier_client, char *hostName, i
 
 void dialogue_serveur(int *descripteur_fichier_client)
 {
-    char message[10000];
-    int entier;
 
 
-    //message à envoyer
-    //message = malloc(sizeof(char*));
-    printf("Veuillez taper un message :\n");
-    scanf("%[^\n]", message);         //scanne tout sauf les retours à la ligne.
-    printf("Message en attente d'envoi... \n");
+	char message_a_envoyer[100];
+	char message_a_recevoir[100];
+	int entier_a_envoyer = 42;
+	int entier_a_recevoir;
 
-    //envoi du message
-    
-    write(*descripteur_fichier_client, message, sizeof(message));
-    printf("Message envoyé\n");
 
-    // Reception de l'entier
-    read(*descripteur_fichier_client, &entier, sizeof(int));
-    printf("Entier reçu du serveur : %d\n", entier);
+	printf("Veuillez entrer un message :\n");
+	scanf("%[^\n]", message_a_envoyer);         //scanne tout sauf les retours à la ligne.
 
-    //fermeture de la connection
-    close(*descripteur_fichier_client);
+
+
+	// test envoi d'un string
+	write(*descripteur_fichier_client, &message_a_envoyer, sizeof(char[100]));
+	printf("Message envoyé\n");
+
+
+	// test Reception d'un string
+	read(*descripteur_fichier_client, &message_a_recevoir, sizeof(char[100]));
+	printf("le serveur a répondu \"%s\"\n", message_a_recevoir);
+
+	// test Reception d'un entier
+	read(*descripteur_fichier_client, &entier_a_recevoir, sizeof(int));
+	printf("Entier reçu du serveur : %d\n", entier_a_recevoir);
+
+	// test envoi d'un entier
+	write(*descripteur_fichier_client, &entier_a_envoyer, sizeof(int));
+	//fermeture de la connection
+	close(*descripteur_fichier_client);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

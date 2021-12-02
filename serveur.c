@@ -49,19 +49,18 @@ void initialisation_connection(int *descripteur_fic, int Nport)
 
 void dialogue_client(int *p)
 {
-  int socketClient;
+  int socketServeur;
   struct sockaddr_in addresseClient;
   socklen_t taille = sizeof(addresseClient);
   struct sigaction action;
-  char chaine_carac[10000];
-  int test = 10; //test d'envoi d'entier au client
+  
 
 
   while (1)
   {
     //Acceptation d'une connexion
-    socketClient = accept(*p, (struct sockaddr *)&addresseClient, &taille);
-    if (socketClient == -1)
+    socketServeur = accept(*p, (struct sockaddr *)&addresseClient, &taille);
+    if (socketServeur == -1)
     {
       perror("accept");
       exit(-1);
@@ -84,22 +83,36 @@ void dialogue_client(int *p)
       exit(-1);
 
     case 0:
-      printf("en attente du Client... \n");
-      read(socketClient, &chaine_carac, sizeof(char[10000]));
+      
+;	char message_du_client[100];
+	char message_pour_le_client[100];
+	int entier_du_client;
+	int entier_pour_client = 26;
+	
+	strcpy(message_pour_le_client, "Le serveur vous remercie pour ce message");
+	
+	//TEST DE RÉCÉPTION D'UN STRING
+	read(socketServeur, &message_du_client, sizeof(char[100]));
+	printf("message du client : %s\n",message_du_client);
+	//test envoi d'un string
+	write(socketServeur, &message_pour_le_client, sizeof(char[100]));
+	
+	//test d'envoi d'un entier
+	write(socketServeur, &entier_pour_client, sizeof(int));
 
-      if (chaine_carac != NULL)
-      {
-        printf("message \"%s\" bien reçu \n", chaine_carac);
-        write(socketClient, &test, sizeof(int));
-      }
-
-      close(socketClient);
+	//test de récéption d'un entier
+	read(socketServeur, &entier_du_client, sizeof(int));
+	printf("entier du client : %d\n",entier_du_client);
+      close(socketServeur);
       exit(0);
     default:
       continue;
     }
   }
 }
+
+
+
 
 void end_child() //HERE <------------------------------------------------------------------------------------------------------
 {

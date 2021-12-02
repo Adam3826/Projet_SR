@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     hostName = argv[1];
 
     initialisationConnection(&descripteur_fichier_client, hostName, Nport);
-    dialogue_serveur(&descripteur_fichier_client);
+    dialogue_serveur(&descripteur_fichier_client);  
 
     return 0;
 }
