@@ -1,0 +1,2 @@
+text/plain
+ `yetet.txt' (No such file or directory)
