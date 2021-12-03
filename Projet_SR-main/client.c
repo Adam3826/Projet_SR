@@ -53,6 +53,7 @@ int menu(int *d){
 	printf("-----------------------Menu---------------------------\n");	
 	printf("            1. consulter les fichier dans le serveur\n"); 
 	printf("            2. deposer un fichier\n");
+	printf("            4. recuperer un fichier\n"); 	
 	printf("            3. Quitter\n"); 	
 	
 		
@@ -83,14 +84,15 @@ int menu(int *d){
 
 
 void dialogue_serveur(int *descripteur_fichier_client){
-    char message[10000];
+    char message[1000];
     int entier;
     FILE *f;
-    char ligne_recu[1000];
-     char *ligne_recu2;
+    char ligne_recu[256];
+     char *ligne_recu2 = NULL;
     int command = 0;
     int nbfic_a_deposer = 0;
     int taille_ligne =8;
+
 
     //message à envoyer
     //message = malloc(sizeof(char*));
@@ -111,23 +113,19 @@ void dialogue_serveur(int *descripteur_fichier_client){
     
   
      if (command == 1){
-      		read(*descripteur_fichier_client,&entier, sizeof(int));                      //reception de la taille du dossier images 
-      		printf("taile du dossier %d",entier);
-      		printf("------------La liste des fichier images disponible-------------\n");
-      		
-      		
-     	       int j=0;
-      	       while(j<entier){ 
-      	       
-      	       read(*descripteur_fichier_client,&taille_ligne, sizeof(int));
-      	       printf("taille de la ligne %d\n",taille_ligne);   							
-      	       ligne_recu2 = (char *)malloc(sizeof(char *) * taille_ligne);      							//  boucle sur la taille du dossier images 
-      	       read(*descripteur_fichier_client,ligne_recu2, sizeof(ligne_recu2));	//  faire le read a chaque envoie du server 
-      	       printf(" ----> %s\n", ligne_recu2);					// affichage  du contenue lu 
-    	       j++;
-	   
-      		}
+      		int n =0;
+      		printf("------------La liste des fichier images disponible-------------\n");	
+	        read(*descripteur_fichier_client,&entier,sizeof(int)); 
+		printf("entier = %d\n", entier);
+
+      	       while((n != entier)){
+			 read(*descripteur_fichier_client,&ligne_recu,256);
+      	       		printf("-----------> : %s\n",ligne_recu);
+      	       		n++;
+						
+      		  }		
     	      }
+    	      	
     	      			
       if (command == 2){
       
