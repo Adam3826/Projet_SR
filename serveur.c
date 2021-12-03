@@ -66,7 +66,7 @@ void dialogue_client(int *p)
   FILE *fichier_2;
   char buffer[256];	
   int taille_ligne=50;
-  int i =0;
+
   while (1)
   {
     //Acceptation d'une connexion
@@ -105,19 +105,34 @@ void dialogue_client(int *p)
       read(socketClient, &test, sizeof(int));    //reception de la command
       printf("la valeur de test est %d\n",test);
 
- //
+    int i = 0;
       if(test == 1){ 
+      
 		printf("le serveur a bien recu votre command\n");
-			  //  on écrit les noms fichiers du dossier images dans un fichier  fic  
-		DIR *dirp;				 //	
+		
+		f = fopen("fic","w");	
+		DIR *dirp;				 
 		struct dirent *dp;			 // la focntion opendir permet de la lecture dans un dossier 
 		dirp = opendir("images");			 
-		dp = readdir(dirp);				
+		dp = readdir(dirp);		
 			
-		while((dp = readdir(dirp)) !=NULL){    //lecture de chaque nom de fichier contenue dans le dossier images et l'écrire dans f
-			          //  ecriture les noms de fichiers  du dossier images dans le fichier f
-			strcpy(buffer,dp->d_name);
-			printf("buffer %s\n", buffer);
+		while((dp = readdir(dirp)) !=NULL){     //lecture de chaque nom de fichier contenue dans le dossier images et l'écrire dans buffer      	
+			fputs(dp->d_name,f);
+			i++; 
+	   	      }
+	   	 fclose(f);     
+	   	
+	   	printf(" i = %d\n",i);      
+		write(socketClient,&i,sizeof(int));		
+		
+		DIR *dir;
+		struct dirent *dpp;
+		dir = opendir("images");
+		dpp = readdir(dir);			 
+		while((dpp = readdir(dir)) !=NULL){             //lecture de chaque nom de fichier contenue dans le dossier images et l'écrire dans buffer
+			          	
+			strcpy(buffer,dpp->d_name);            //  ecriture les noms de fichiers  du dossier images dans le fichier buffer
+			printf("buffer = %s\n",buffer);
 			write(socketClient, buffer,256);  
 			
 	   	      }
@@ -150,33 +165,37 @@ void dialogue_client(int *p)
       		    	fichier_1 = fopen("mime_fichier.txt","r");
       		    	fichier_2 = fopen("mime", "r");
       		    		
-      		    	fgets(mimefic,30,fichier_1);            // mettre le contenue de mime_fichier.txt dans un tabeau de caracteres  "mimefic"
+      		    	fgets(mimefic,30,fichier_1);            		// mettre le contenue de mime_fichier.txt dans un tabeau de caracteres  "mimefic"
       		    	int vrai = 0;
-      			while(fgets(ligne,50,fichier_2) != NULL){      // On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"
-      			   if (strcmp(mimefic,ligne) ==0){       // comparer le mime du fichier envoyer par le client  avec les mimes admissibles
+      			while(fgets(ligne,50,fichier_2) != NULL){      		// On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"
+      			   if (strcmp(mimefic,ligne) ==0){     			  // comparer le mime du fichier envoyer par le client  avec les mimes admissibles
       					printf("le fichier est admissible\n");
-      					vrai =1;                       // mettre la varaible vrai egale a 1 si  le fichier est admissible
+      					vrai =1;                       			// mettre la varaible vrai egale a 1 si  le fichier est admissible
       					}		
       				
       				}
       							    		
       			if (vrai != 1){
       			 	printf("le fichier n'est pas admissible\n");
-      			 	/* envoyer un message au client pour l informer que le fichier n est pas admissible*/
+      			       /* envoyer un message au client pour l informer que le fichier n est pas admissible*/
+      			       	unlink(chaine_carac);
       			}
       			else{ 
-      			  int fic;
-	 		  char dossier[20] = "images/";        //vratiable pour stocker le fichier dans le dossier image  
-	 		  strcat(dossier,chaine_carac);        // concatener le dossier avec le nom du fichier afin de crée le fichier dans le dossier images
-	 		  printf("je suis dans le serveur le fichier que le client m'a envoyer est %s\n",dossier);
-                          fic = open(dossier,O_CREAT,0644);  // creation de fichier dans le dossier images 
-	 		  close(fic);                        // ferme le fichier   
-	 	
-	 		// lire le contenus du fichier envoyer depuis le client est le recopier dans le fichier crée dans images	
-			  f = fopen(dossier,"w");	          
-			 		 while(read(socketClient, &buffer, sizeof(buffer))){  // On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"		
-      		      			      fputs(buffer,f);  
-      					 }
+      			  	int fic;
+	 			char dossier[20] = "images/";
+	 			read(socketClient, &chaine_carac, sizeof(chaine_carac));
+	 			strcat(dossier,chaine_carac);
+	 			printf("je suis dans le serveur le fichier que le client m'a envoyer est %s\n",dossier);
+	 			fic = open(dossier,O_CREAT,0644);
+	 			close(fic);
+	 			
+	 			f = fopen(dossier,"w");	
+	 			while(read(socketClient, &buffer, sizeof(buffer))){  // On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"
+      						
+      		 		     	printf("buffer : %s",buffer);		
+      		      			fputs(buffer,f);  
+      			          				 				
+      					}
 					fclose(f);
 				}
 				
