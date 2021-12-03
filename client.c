@@ -53,6 +53,7 @@ int menu(int *d){
 	printf("-----------------------Menu---------------------------\n");	
 	printf("            1. consulter les fichier dans le serveur\n"); 
 	printf("            2. deposer un fichier\n");
+	printf("            4. Quitter\n"); 	
 	printf("            3. Quitter\n"); 	
 	
 		
@@ -83,12 +84,14 @@ int menu(int *d){
 
 
 void dialogue_serveur(int *descripteur_fichier_client){
-    char message[10000];
+    char message[1000];
     int entier;
     FILE *f;
-    char ligne_recu[100];
+    char ligne_recu[256];
+     char *ligne_recu2 = NULL;
     int command = 0;
     int nbfic_a_deposer = 0;
+    int taille_ligne =8;
 
     //message à envoyer
     //message = malloc(sizeof(char*));
@@ -109,14 +112,13 @@ void dialogue_serveur(int *descripteur_fichier_client){
     
   
      if (command == 1){
-      		read(*descripteur_fichier_client,&entier, sizeof(int));                       //reception de la taille du dossier images 
-      		printf("------------La liste des fichier images disponible-------------\n");
-      
-     	       int j=0;
-      	       while(j<entier){ 							//  boucle sur la taille du dossier images 
-      	       read(*descripteur_fichier_client,ligne_recu, sizeof(ligne_recu));	//  faire le read a chaque envoie du server 
-      	       printf(" ----> %s\n", ligne_recu);					// affichage  du contenue lu 
-    	       j++;	   
+      		//read(*descripteur_fichier_client,&entier, sizeof(int));                      //reception de la taille du dossier images 
+      		//printf("taile du dossier %d\n",entier);
+      		//printf("------------La liste des fichier images disponible-------------\n")		
+
+      	       while(read(*descripteur_fichier_client,&ligne_recu,256) !=0){	 
+      	       		printf("buffer : %s\n",ligne_recu);	
+	   
       		}
     	      }
     	      			
@@ -132,13 +134,32 @@ void dialogue_serveur(int *descripteur_fichier_client){
       			scanf("%s", message);
       			write(*descripteur_fichier_client,message,sizeof(message));  							
       			i++;
-      		}	     	
+      		}
+      		   //printf("Veuillez entrer le nom du fichier à telecharger\n");
+      		   //scanf("%s",message);
+      		   //write(*descripteur_fichier_client,message,sizeof(message));
+      		f = fopen(message,"r");		
+      		while(fgets(ligne_recu,200,f) != NULL){  // On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"
+      		        write(*descripteur_fichier_client,ligne_recu,sizeof(ligne_recu));					
+      		}	
+      			     	
       }
       
       if (command == 3){
-      	
+      	  
+      	  	printf("Veuillez entrer le nom du fichier à telecharger\n");
+      		scanf("%s",message);
+      		write(*descripteur_fichier_client,message,sizeof(message));
+      		f = fopen(message,"r");		
+      		while(fgets(ligne_recu,200,f) != NULL){  // On lit 50 caractères du fichier_2, on stocke le tout dans "ligne"
+      		        write(*descripteur_fichier_client,ligne_recu,sizeof(ligne_recu));
+      			printf(" ligne_recu = %s", ligne_recu);							
+      		}	
+      		
+      		
+      		fclose(f);
       				
-      }
+      }		
 	
  
     //fermeture de la connection
