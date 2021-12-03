@@ -5,8 +5,6 @@ void initialisationConnection(int *descripteur_fichier_client, char *hostName, i
    
     struct sockaddr_in pointeur_socket;
     struct hostent *host_name;
-    
-    //strcpy(hostName, argv[1]);
 
     //---------creation du socket--------
     *descripteur_fichier_client = socket(AF_INET, SOCK_STREAM, 0);
@@ -22,6 +20,8 @@ void initialisationConnection(int *descripteur_fichier_client, char *hostName, i
 
     //récupération dans host_name des informations concernant le serveur
     host_name = gethostbyname(hostName);
+
+    //TO DO comment
     memcpy(&pointeur_socket.sin_addr.s_addr, host_name->h_addr, host_name->h_length);
 
     //preparation des champs sin_family, sin_addr et sin_port
@@ -57,20 +57,32 @@ void dialogue_serveur(int *descripteur_fichier_client)
 
 
 	// test envoi d'un string
-	write(*descripteur_fichier_client, &message_a_envoyer, sizeof(char[100]));
+	if(write(*descripteur_fichier_client, &message_a_envoyer, sizeof(char[100]))==-1){
+		perror("write message à envoyer");
+		exit(-1);
+	}
 	printf("Message envoyé\n");
 
 
 	// test Reception d'un string
-	read(*descripteur_fichier_client, &message_a_recevoir, sizeof(char[100]));
+	if(read(*descripteur_fichier_client, &message_a_recevoir, sizeof(char[100]))==-1){
+		perror("read message à recevoir");
+		exit(-1);
+	}
 	printf("le serveur a répondu \"%s\"\n", message_a_recevoir);
 
 	// test Reception d'un entier
-	read(*descripteur_fichier_client, &entier_a_recevoir, sizeof(int));
+	if(read(*descripteur_fichier_client, &entier_a_recevoir, sizeof(int))==-1){
+		perror("read entier à reçevoir");
+		exit(-1);
+	}
 	printf("Entier reçu du serveur : %d\n", entier_a_recevoir);
 
 	// test envoi d'un entier
-	write(*descripteur_fichier_client, &entier_a_envoyer, sizeof(int));
+	if(write(*descripteur_fichier_client, &entier_a_envoyer, sizeof(int))==-1){
+		perror("write entier à envoyer");
+		exit(-1);
+	}
 	//fermeture de la connection
 	close(*descripteur_fichier_client);
 }

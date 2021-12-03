@@ -1,0 +1,33 @@
+
+Compilation :
+
+
+executer la commande "make"
+
+utiliser la commande "make clean" pour supprimer les fichiers objet et les executables.
+
+
+
+
+Utilisation :
+
+sur la machine où l'on souhaite executer le serveur,
+
+saisir dans la console
+"./serveur_main noport"
+
+où noport est le numero de port. prendre une grande valeur de port (>15 000) pour en utiliser un disponible.
+
+pour connaitre l'adresse du serveur, executer dans la console de la machine qui fait tourner le serveur
+"ifconfig"
+
+
+
+sur la machine où l'on souhaite executer le client, 
+saisir dans la console
+"./client_main nom_serveur noport"
+
+noport doit être le même que celui du serveur
+
+
+

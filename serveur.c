@@ -92,16 +92,29 @@ void dialogue_client(int *p)
 	strcpy(message_pour_le_client, "Le serveur vous remercie pour ce message");
 	
 	//TEST DE RÉCÉPTION D'UN STRING
-	read(socketServeur, &message_du_client, sizeof(char[100]));
+	if(read(socketServeur, &message_du_client, sizeof(char[100]))==-1){
+		perror("read message à reçevoir");
+		exit(-1);
+	}
+
 	printf("message du client : %s\n",message_du_client);
 	//test envoi d'un string
-	write(socketServeur, &message_pour_le_client, sizeof(char[100]));
+	if(write(socketServeur, &message_pour_le_client, sizeof(char[100]))==-1){
+		perror("write message à envoyer");
+		exit(-1);
+	}
 	
 	//test d'envoi d'un entier
-	write(socketServeur, &entier_pour_client, sizeof(int));
+	if(write(socketServeur, &entier_pour_client, sizeof(int))==-1){
+		perror("write entier à envoyer");
+		exit(-1);
+	}
 
 	//test de récéption d'un entier
-	read(socketServeur, &entier_du_client, sizeof(int));
+	if(read(socketServeur, &entier_du_client, sizeof(int))==-1){
+		perror("read entier à reçevoir");
+		exit(-1);
+	}
 	printf("entier du client : %d\n",entier_du_client);
       close(socketServeur);
       exit(0);
